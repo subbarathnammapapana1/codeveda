@@ -1,0 +1,35 @@
+import requests
+
+def fetch_crypto_price(crypto_id='bitcoin', currency='usd'):
+    url = f"https://api.coingecko.com/api/v3/simple/price"
+    params = {
+        'ids': crypto_id,
+        'vs_currencies': currency
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+
+        data = response.json()
+
+        if crypto_id in data and currency in data[crypto_id]:
+            price = data[crypto_id][currency]
+            print(f"The current price of {crypto_id.capitalize()} is {price} {currency.upper()}.")
+        else:
+            print("Unexpected response format or data not found.")
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.ConnectionError:
+        print("Error: Could not connect to the API.")
+    except requests.exceptions.Timeout:
+        print("Error: Request timed out.")
+    except requests.exceptions.RequestException as err:
+        print(f"An error occurred: {err}")
+    except ValueError:
+        print("Error parsing the response JSON.")
+
+if __name__ == "__main__":
+    crypto = input("Enter the cryptocurrency ID (e.g., bitcoin, ethereum): ").strip().lower()
+    currency = input("Enter the currency (e.g., usd, eur): ").strip().lower()
+    fetch_crypto_price(crypto, currency)
