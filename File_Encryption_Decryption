@@ -1,0 +1,67 @@
+def caesar_encrypt(text, shift):
+    result = []
+    for char in text:
+        if char.isalpha():
+            # Preserve uppercase and lowercase
+            base = ord('A') if char.isupper() else ord('a')
+            # Shift character and wrap around alphabet
+            shifted = (ord(char) - base + shift) % 26 + base
+            result.append(chr(shifted))
+        else:
+            # Non-alphabetical characters remain unchanged
+            result.append(char)
+    return ''.join(result)
+
+def caesar_decrypt(text, shift):
+    # Decryption is just encryption with negative shift
+    return caesar_encrypt(text, -shift)
+
+def encrypt_file(input_path, output_path, shift):
+    try:
+        with open(input_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        encrypted_content = caesar_encrypt(content, shift)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(encrypted_content)
+        print(f"File encrypted successfully and saved as '{output_path}'.")
+    except FileNotFoundError:
+        print(f"Error: File '{input_path}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+def decrypt_file(input_path, output_path, shift):
+    try:
+        with open(input_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        decrypted_content = caesar_decrypt(content, shift)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(decrypted_content)
+        print(f"File decrypted successfully and saved as '{output_path}'.")
+    except FileNotFoundError:
+        print(f"Error: File '{input_path}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+def main():
+    print("Basic File Encryption/Decryption with Caesar Cipher")
+    operation = input("Do you want to (E)ncrypt or (D)ecrypt? ").strip().upper()
+    if operation not in ('E', 'D'):
+        print("Invalid option selected. Please enter 'E' or 'D'.")
+        return
+    
+    input_file = input("Enter the path to the input text file: ").strip()
+    output_file = input("Enter the path for the output file: ").strip()
+    
+    try:
+        shift = int(input("Enter the shift key (integer): ").strip())
+    except ValueError:
+        print("Invalid shift key. Please enter an integer value.")
+        return
+
+    if operation == 'E':
+        encrypt_file(input_file, output_file, shift)
+    else:
+        decrypt_file(input_file, output_file, shift)
+
+if __name__ == "__main__":
+    main()
