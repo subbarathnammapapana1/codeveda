@@ -1,0 +1,41 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+def scrape_website(url, output_csv):
+    try:
+        # Send HTTP GET request
+        response = requests.get(url)
+        response.raise_for_status()  # Raise error if request failed
+
+        # Parse the HTML content
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Extract specific data - example: all article titles inside <h2> tags with class 'title'
+        # (Customize the selector based on the website structure)
+        titles = soup.find_all('h2', class_='title')
+
+        # Prepare data for CSV
+        data = []
+        for title in titles:
+            text = title.get_text(strip=True)
+            data.append([text])
+
+        # Save extracted data into a CSV file
+        with open(output_csv, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Title'])  # header
+            writer.writerows(data)
+
+        print(f"Scraped data saved to '{output_csv}'.")
+
+    except requests.RequestException as e:
+        print(f"Error during requests to {url}: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    # Example usage - change URL and output file as needed
+    url = "https://example.com/news"
+    output_csv = "scraped_data.csv"
+    scrape_website(url, output_csv)
